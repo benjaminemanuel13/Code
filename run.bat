@@ -1,0 +1,1 @@
+D:\SpectrumNext\Tools\CSpect\cspect -sound -brk -zxnext -w4 hello_world.nex

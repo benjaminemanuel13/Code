@@ -1,0 +1,100 @@
+C:/Users/benja/AppData/Local/Temp/zcc000029785E692.asm:
+     1                          MODULE IRQs_asm
+     2                          LINE 0, "IRQs.asm"
+IRQs.asm:
+                                
+     1                          
+     2                                          SECTION KERNEL_IRQ
+     3                                          PUBLIC _SetUpIRQs
+     4                                          PUBLIC _VBlank,_Port123b
+     5                          
+     6                          
+     7                          ; ******************************************************************************************************************************
+     8                          ;   Main IRQ vector - org'd at $FCFC  (as per sepctrum IM2 rules of Lo/Hi need to be the same value)
+     9                          ; ******************************************************************************************************************************
+    10                          
+    11  0000  fb                IM2Routine:     ei
+    12  0001  c30f01                            jp      IRQHandler
+    13                          
+    14                                          ; $fd00    ($fcfc + 4 bytes)
+    15                          VectorTable:
+    16  0004  0000000000000000                  dw      IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+    17  0024  0000000000000000                  dw      IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+    18  0044  0000000000000000                  dw      IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+    19  0064  0000000000000000                  dw      IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+    20  0084  0000000000000000                  dw      IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+    21  00a4  0000000000000000                  dw      IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+    22  00c4  0000000000000000                  dw      IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+    23  00e4  0000000000000000                  dw      IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine,IM2Routine
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+    24  0104  0000                              dw      IM2Routine
+    25                          
+    26                          
+    27                          ; ******************************************************************************************************************************
+    28                          ;   Setup IRQ function - 512 bytes left at this point
+    29                          ; ******************************************************************************************************************************
+    30                          _SetUpIRQs:
+    31  0106  f3                                di
+    32  0107  3e00                              ld      a,VectorTable>>8
+    33  0109  ed47                              ld      i,a
+    34  010b  ed5e                              im      2                       ; Setup IM2 mode
+    35  010d  fb                                ei
+    36  010e  c9                                ret
+    37                          
+    38                          ; ******************************************************************************************************************************
+    39                          ;   Main IRQ function - 512 bytes left at this point
+    40                          ; ******************************************************************************************************************************
+    41                          IRQHandler:
+    42  010f  f5                                push    af
+    43                          
+    44                                          ; Flag VBlank
+    45  0110  3e01                              ld      a,1
+    46  0112  321801                            ld      (_VBlank),a
+    47                          
+    48                          ExitIRQ:
+    49  0115  f1                                pop     af
+    50  0116  ed4d                              reti
+    51                          
+    52                          
+    53                          ; ******************************************************************************************************************************
+    54                          ; IRQ Data
+    55                          ; ******************************************************************************************************************************
+    56  0118  00                _VBlank:        db      0
+    57  0119  00                _Port123b:      db      0
+    58                          
+    59                          
+    60                          
+    61                          ; ******************************************************************************************************************************
+    62                          ; write this so that we can detect overruns from the IRQ segment
+    63                          ; ******************************************************************************************************************************
+    64                          SECTION KERNEL_END
+    65  0000  c9                ENDIRQ:         ret
+    66                          
+    67                          
+    68                          
+    69                          
+    70                          
+    71                          

@@ -1,0 +1,99 @@
+C:/Users/benja/AppData/Local/Temp/zcc00001EB85E6B2.asm:
+     1                          MODULE FrontEnd_Asm_asm
+     2                          LINE 0, "FrontEnd_Asm.asm"
+FrontEnd_Asm.asm:
+                                
+     1                          
+     2                              SECTION FRONTEND_SEG
+     3                              PUBLIC _FrontEndTest
+     4                          
+     5                              include "includes.inc"
+includes.inc:
+     1                          ; ******************************************************************************************************************************
+     2                          ;
+     3                          ;	Assembler Includes
+     4                          ;
+     5                          ; ******************************************************************************************************************************
+     6                          
+     7                          	; ULA screen
+     8                                  defc ULAScreen = 0x4000                                     ; ULA screen in z80 64k space
+     9                                  defc AttrScreen = ((ULAScreen)+(32*192))                    ; Attribute screen  in z80 64k space
+    10                                  defc ULAScreenPysical = (10*8192)                           ; ULA screen physical address
+    11                                  defc AttrScreenPysical = ((ULAScreenPysical)+(32*192))      ; Attribute screen physical address
+    12                          
+    13                          
+    14                                  ; ports
+    15                                  defc Z80DMAPORT  		= 107				; DMA port
+    16                                  defc SpriteRegPort		= 0x57
+    17                                  defc SpriteShapePort 		= 0x5b
+    18                          
+    19                          
+    20                          	; half row 1
+    21                                  defc VK_CAPS	=	0
+    22                                  defc VK_Z	=	1
+    23                                  defc VK_X	=	2
+    24                                  defc VK_C	=	3
+    25                                  defc VK_V	=	4
+    26                          	; half row 2
+    27                                  defc VK_A	=	5
+    28                                  defc VK_S	=	6
+    29                                  defc VK_D	=	7
+    30                                  defc VK_F	=	8
+    31                                  defc VK_G	=	9
+    32                          	; half row 3
+    33                                  defc VK_Q	=	10
+    34                                  defc VK_W	=	11
+    35                                  defc VK_E	=	12
+    36                                  defc VK_R	=	13
+    37                                  defc VK_T	=	14
+    38                          	; half row 4
+    39                                  defc VK_1	=	15
+    40                                  defc VK_2	=	16
+    41                                  defc VK_3	=	17
+    42                                  defc VK_4	=	18
+    43                                  defc VK_5	=	19
+    44                          
+    45                          	; half row 5
+    46                                  defc VK_0	=	20
+    47                                  defc VK_9	=	21
+    48                                  defc VK_8	=	22
+    49                                  defc VK_7	=	23
+    50                                  defc VK_6	=	24
+    51                          	; half row 6
+    52                                  defc VK_P	=	25
+    53                                  defc VK_O	=	26
+    54                                  defc VK_I	=	27
+    55                                  defc VK_U	=	28
+    56                                  defc VK_Y	=	29
+    57                          
+    58                          	; half row 7
+    59                                  defc VK_ENTER	=	30
+    60                                  defc VK_L	=	31
+    61                                  defc VK_K	=	32
+    62                                  defc VK_J	=	33
+    63                                  defc VK_H	=	34
+    64                          	; half row 8
+    65                                  defc VK_SPACE	=	35
+    66                                  defc VK_SYM	=	36
+    67                                  defc VK_M	=	37
+    68                                  defc VK_N	=	38
+    69                                  defc VK_B	=	39
+    70                          
+    71                          
+    72                          
+FrontEnd_Asm.asm:
+     6                          
+     7                          _FrontEndTest:
+     8  0000  f5                    push    af
+     9  0001  3e01                  ld      a,1
+    10  0003  00                    nop
+    11  0004  3e02                  ld      a,2
+    12  0006  f1                    pop     af
+    13  0007  c9                    ret
+    14                          
+    15  0008  0000                  dw _FrontEndTest
+    16  000a  48656c6c6f            db "Hello"
+    17                          
+    18                          
+    19                          
+    20                          

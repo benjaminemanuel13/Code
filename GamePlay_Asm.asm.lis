@@ -1,0 +1,164 @@
+C:/Users/benja/AppData/Local/Temp/zcc0000218C7B672.asm:
+     1                          MODULE GamePlay_Asm_asm
+     2                          LINE 0, "GamePlay_Asm.asm"
+GamePlay_Asm.asm:
+                                
+     1                          
+     2                              SECTION GAMEPLAY_SEG
+     3                              PUBLIC _GamePlayTest
+     4                              PUBLIC _sprites
+     5                          
+     6                              include "includes.inc"
+includes.inc:
+     1                          ; ******************************************************************************************************************************
+     2                          ;
+     3                          ;	Assembler Includes
+     4                          ;
+     5                          ; ******************************************************************************************************************************
+     6                          
+     7                          	; ULA screen
+     8                                  defc ULAScreen = 0x4000                                     ; ULA screen in z80 64k space
+     9                                  defc AttrScreen = ((ULAScreen)+(32*192))                    ; Attribute screen  in z80 64k space
+    10                                  defc ULAScreenPysical = (10*8192)                           ; ULA screen physical address
+    11                                  defc AttrScreenPysical = ((ULAScreenPysical)+(32*192))      ; Attribute screen physical address
+    12                          
+    13                          
+    14                                  ; ports
+    15                                  defc Z80DMAPORT  		= 107				; DMA port
+    16                                  defc SpriteRegPort		= 0x57
+    17                                  defc SpriteShapePort 		= 0x5b
+    18                          
+    19                          
+    20                          	; half row 1
+    21                                  defc VK_CAPS	=	0
+    22                                  defc VK_Z	=	1
+    23                                  defc VK_X	=	2
+    24                                  defc VK_C	=	3
+    25                                  defc VK_V	=	4
+    26                          	; half row 2
+    27                                  defc VK_A	=	5
+    28                                  defc VK_S	=	6
+    29                                  defc VK_D	=	7
+    30                                  defc VK_F	=	8
+    31                                  defc VK_G	=	9
+    32                          	; half row 3
+    33                                  defc VK_Q	=	10
+    34                                  defc VK_W	=	11
+    35                                  defc VK_E	=	12
+    36                                  defc VK_R	=	13
+    37                                  defc VK_T	=	14
+    38                          	; half row 4
+    39                                  defc VK_1	=	15
+    40                                  defc VK_2	=	16
+    41                                  defc VK_3	=	17
+    42                                  defc VK_4	=	18
+    43                                  defc VK_5	=	19
+    44                          
+    45                          	; half row 5
+    46                                  defc VK_0	=	20
+    47                                  defc VK_9	=	21
+    48                                  defc VK_8	=	22
+    49                                  defc VK_7	=	23
+    50                                  defc VK_6	=	24
+    51                          	; half row 6
+    52                                  defc VK_P	=	25
+    53                                  defc VK_O	=	26
+    54                                  defc VK_I	=	27
+    55                                  defc VK_U	=	28
+    56                                  defc VK_Y	=	29
+    57                          
+    58                          	; half row 7
+    59                                  defc VK_ENTER	=	30
+    60                                  defc VK_L	=	31
+    61                                  defc VK_K	=	32
+    62                                  defc VK_J	=	33
+    63                                  defc VK_H	=	34
+    64                          	; half row 8
+    65                                  defc VK_SPACE	=	35
+    66                                  defc VK_SYM	=	36
+    67                                  defc VK_M	=	37
+    68                                  defc VK_N	=	38
+    69                                  defc VK_B	=	39
+    70                          
+    71                          
+    72                          
+GamePlay_Asm.asm:
+     7                          
+     8                          _GamePlayTest:
+     9  0000  f5                    push    af
+    10  0001  3e01                  ld      a,1
+    11  0003  00                    nop
+    12  0004  3e02                  ld      a,2
+    13  0006  f1                    pop     af
+    14  0007  c9                    ret
+    15                          
+    16  0008  0000                  dw _GamePlayTest
+    17  000a  48656c6c6f            db "Hello"
+    18                          
+    19                          _sprites:
+    20  000f  e3e3e3e3e3e3e3e3  	db  $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3
+              e3e3e3e3e3e3e3e3  
+    21  001f  e3e3e3e3e3e3ffff  	db  $E3, $E3, $E3, $E3, $E3, $E3, $FF, $FF, $FF, $FF, $E3, $E3, $E3, $E3, $E3, $E3
+              ffffe3e3e3e3e3e3  
+    22  002f  e3e3e3e3e3ffe3e3  	db  $E3, $E3, $E3, $E3, $E3, $FF, $E3, $E3, $E3, $E3, $FF, $E3, $E3, $E3, $E3, $E3
+              e3e3ffe3e3e3e3e3  
+    23  003f  e3e3e3e3ffe3e3e3  	db  $E3, $E3, $E3, $E3, $FF, $E3, $E3, $E3, $E3, $E3, $E3, $FF, $E3, $E3, $E3, $E3
+              e3e3e3ffe3e3e3e3  
+    24  004f  e3e3e3ffe3e3e3e3  	db  $E3, $E3, $E3, $FF, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $FF, $E3, $E3, $E3
+              e3e3e3e3ffe3e3e3  
+    25  005f  e3e3ffe3e3e3e3e3  	db  $E3, $E3, $FF, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $FF, $E3, $E3
+              e3e3e3e3e3ffe3e3  
+    26  006f  e3ffe3e3e3e3e3e3  	db  $E3, $FF, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $FF, $E3
+              e3e3e3e3e3e3ffe3  
+    27  007f  e3ffe3e3e3e3e3e3  	db  $E3, $FF, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $FF, $E3
+              e3e3e3e3e3e3ffe3  
+    28  008f  e3ffe3e3e3e3e3e3  	db  $E3, $FF, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $FF, $E3
+              e3e3e3e3e3e3ffe3  
+    29  009f  e3ffe3e3e3e3e3e3  	db  $E3, $FF, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $FF, $E3
+              e3e3e3e3e3e3ffe3  
+    30  00af  e3e3ffe3e3e3e3e3  	db  $E3, $E3, $FF, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $FF, $E3, $E3
+              e3e3e3e3e3ffe3e3  
+    31  00bf  e3e3e3ffe3e3e3e3  	db  $E3, $E3, $E3, $FF, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $FF, $E3, $E3, $E3
+              e3e3e3e3ffe3e3e3  
+    32  00cf  e3e3e3e3ffe3e3e3  	db  $E3, $E3, $E3, $E3, $FF, $E3, $E3, $E3, $E3, $E3, $E3, $FF, $E3, $E3, $E3, $E3
+              e3e3e3ffe3e3e3e3  
+    33  00df  e3e3e3e3e3ffe3e3  	db  $E3, $E3, $E3, $E3, $E3, $FF, $E3, $E3, $E3, $E3, $FF, $E3, $E3, $E3, $E3, $E3
+              e3e3ffe3e3e3e3e3  
+    34  00ef  e3e3e3e3e3e3ffff  	db  $E3, $E3, $E3, $E3, $E3, $E3, $FF, $FF, $FF, $FF, $E3, $E3, $E3, $E3, $E3, $E3
+              ffffe3e3e3e3e3e3  
+    35  00ff  e3e3e3e3e3e3e3e3  	db  $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3
+              e3e3e3e3e3e3e3e3  
+    36                          
+    37  010f  e3e3e3e3e3e3e3e3  	db  $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3
+              e3e3e3e3e3e3e3e3  
+    38  011f  e3e3e3e3e3e38888  	db  $E3, $E3, $E3, $E3, $E3, $E3, $88, $88, $88, $88, $E3, $E3, $E3, $E3, $E3, $E3
+              8888e3e3e3e3e3e3  
+    39  012f  e3e3e3e3e388e3e3  	db  $E3, $E3, $E3, $E3, $E3, $88, $E3, $E3, $E3, $E3, $88, $E3, $E3, $E3, $E3, $E3
+              e3e388e3e3e3e3e3  
+    40  013f  e3e3e3e388e3e3e3  	db  $E3, $E3, $E3, $E3, $88, $E3, $E3, $E3, $E3, $E3, $E3, $88, $E3, $E3, $E3, $E3
+              e3e3e388e3e3e3e3  
+    41  014f  e3e3e388e3e3e3e3  	db  $E3, $E3, $E3, $88, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $88, $E3, $E3, $E3
+              e3e3e3e388e3e3e3  
+    42  015f  e3e388e3e3e3e3e3  	db  $E3, $E3, $88, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $88, $E3, $E3
+              e3e3e3e3e388e3e3  
+    43  016f  e388e3e3e3e3e3e3  	db  $E3, $88, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $88, $E3
+              e3e3e3e3e3e388e3  
+    44  017f  e388e3e3e3e3e3e3  	db  $E3, $88, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $88, $E3
+              e3e3e3e3e3e388e3  
+    45  018f  e388e3e3e3e3e3e3  	db  $E3, $88, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $88, $E3
+              e3e3e3e3e3e388e3  
+    46  019f  e388e3e3e3e3e3e3  	db  $E3, $88, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $88, $E3
+              e3e3e3e3e3e388e3  
+    47  01af  e3e388e3e3e3e3e3  	db  $E3, $E3, $88, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $88, $E3, $E3
+              e3e3e3e3e388e3e3  
+    48  01bf  e3e3e388e3e3e3e3  	db  $E3, $E3, $E3, $88, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $88, $E3, $E3, $E3
+              e3e3e3e388e3e3e3  
+    49  01cf  e3e3e3e388e3e3e3  	db  $E3, $E3, $E3, $E3, $88, $E3, $E3, $E3, $E3, $E3, $E3, $88, $E3, $E3, $E3, $E3
+              e3e3e388e3e3e3e3  
+    50  01df  e3e3e3e3e388e3e3  	db  $E3, $E3, $E3, $E3, $E3, $88, $E3, $E3, $E3, $E3, $88, $E3, $E3, $E3, $E3, $E3
+              e3e388e3e3e3e3e3  
+    51  01ef  e3e3e3e3e3e38888  	db  $E3, $E3, $E3, $E3, $E3, $E3, $88, $88, $88, $88, $E3, $E3, $E3, $E3, $E3, $E3
+              8888e3e3e3e3e3e3  
+    52  01ff  e3e3e3e3e3e3e3e3  	db  $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3
+              e3e3e3e3e3e3e3e3  
+    53                          

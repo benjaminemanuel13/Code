@@ -1,0 +1,1090 @@
+C:/Users/benja/AppData/Local/Temp/zcc00001FA85E692.asm:
+     1                          MODULE Kernel_asm
+     2                          LINE 0, "Kernel.asm"
+Kernel.asm:
+                                
+     1                          
+     2                              SECTION KERNEL_CODE
+     3                              PUBLIC  _WaitVBlank, _Layer2Enable, _ClsATTR, _ClsULA, _PrintHex, _DMACopy, _UploadSprites, _ReadKeyboard, _InitKernel
+     4                              PUBLIC  _Keys, _RawKeys, _RomFont, _Print,  _CopySpriteData, _ReadNextReg,_InitSpriteData,_WipeSprites
+     5                          
+     6                              EXTERN  _VBlank, _Port123b, _SpriteData, _SpriteShape
+     7                          
+     8                              include "includes.inc"
+includes.inc:
+     1                          ; ******************************************************************************************************************************
+     2                          ;
+     3                          ;	Assembler Includes
+     4                          ;
+     5                          ; ******************************************************************************************************************************
+     6                          
+     7                          	; ULA screen
+     8                                  defc ULAScreen = 0x4000                                     ; ULA screen in z80 64k space
+     9                                  defc AttrScreen = ((ULAScreen)+(32*192))                    ; Attribute screen  in z80 64k space
+    10                                  defc ULAScreenPysical = (10*8192)                           ; ULA screen physical address
+    11                                  defc AttrScreenPysical = ((ULAScreenPysical)+(32*192))      ; Attribute screen physical address
+    12                          
+    13                          
+    14                                  ; ports
+    15                                  defc Z80DMAPORT  		= 107				; DMA port
+    16                                  defc SpriteRegPort		= 0x57
+    17                                  defc SpriteShapePort 		= 0x5b
+    18                          
+    19                          
+    20                          	; half row 1
+    21                                  defc VK_CAPS	=	0
+    22                                  defc VK_Z	=	1
+    23                                  defc VK_X	=	2
+    24                                  defc VK_C	=	3
+    25                                  defc VK_V	=	4
+    26                          	; half row 2
+    27                                  defc VK_A	=	5
+    28                                  defc VK_S	=	6
+    29                                  defc VK_D	=	7
+    30                                  defc VK_F	=	8
+    31                                  defc VK_G	=	9
+    32                          	; half row 3
+    33                                  defc VK_Q	=	10
+    34                                  defc VK_W	=	11
+    35                                  defc VK_E	=	12
+    36                                  defc VK_R	=	13
+    37                                  defc VK_T	=	14
+    38                          	; half row 4
+    39                                  defc VK_1	=	15
+    40                                  defc VK_2	=	16
+    41                                  defc VK_3	=	17
+    42                                  defc VK_4	=	18
+    43                                  defc VK_5	=	19
+    44                          
+    45                          	; half row 5
+    46                                  defc VK_0	=	20
+    47                                  defc VK_9	=	21
+    48                                  defc VK_8	=	22
+    49                                  defc VK_7	=	23
+    50                                  defc VK_6	=	24
+    51                          	; half row 6
+    52                                  defc VK_P	=	25
+    53                                  defc VK_O	=	26
+    54                                  defc VK_I	=	27
+    55                                  defc VK_U	=	28
+    56                                  defc VK_Y	=	29
+    57                          
+    58                          	; half row 7
+    59                                  defc VK_ENTER	=	30
+    60                                  defc VK_L	=	31
+    61                                  defc VK_K	=	32
+    62                                  defc VK_J	=	33
+    63                                  defc VK_H	=	34
+    64                          	; half row 8
+    65                                  defc VK_SPACE	=	35
+    66                                  defc VK_SYM	=	36
+    67                                  defc VK_M	=	37
+    68                                  defc VK_N	=	38
+    69                                  defc VK_B	=	39
+    70                          
+    71                          
+    72                          
+Kernel.asm:
+     9                          
+    10                          
+    11                          ; ******************************************************************************************************************************
+    12                          ;   Init the Kernel
+    13                          ; ******************************************************************************************************************************
+    14                          _InitKernel:
+    15  0000  21003d                ld      hl,0x3d00
+    16  0003  119102                ld      de,_RomFont
+    17  0006  010003                ld      bc,0x300
+    18  0009  cda100                call    DMACopy
+    19                          
+    20  000c  c9                    ret
+    21                          
+    22                              ; ******************************************************************************************************************************
+    23                          ;   Wipe all sprites
+    24                          ; ******************************************************************************************************************************
+    25                          _WipeSprites:
+    26  000d  dd219108              ld      ix, _SpriteData
+    27  0011  0680                  ld      b,128
+    28  0013  0e40                  ld      c,64
+    29  0015  110500                ld      de,5
+    30  0018  af                    xor     a
+    31                          @InitSprites:
+    32  0019  dd7700                ld      (ix+0),a
+    33  001c  dd7701                ld      (ix+1),a
+    34  001f  dd7702                ld      (ix+2),a
+    35  0022  dd7103                ld      (ix+3),c        ; %01000000 - enable byte 4
+    36  0025  dd7700                ld      (ix+0),a
+    37  0028  dd19                  add     ix,de
+    38  002a  10ed                  djnz    @InitSprites
+    39  002c  c9                    ret
+    40                          
+    41                          ; ******************************************************************************************************************************
+    42                          ;   Reset all sprite data, including the extra bit for using 5th byte
+    43                          ; ******************************************************************************************************************************
+    44                          _InitSpriteData:
+    45  002d  dd219108              ld      ix, _SpriteData
+    46  0031  0680                  ld      b,128
+    47  0033  0e40                  ld      c,64
+    48  0035  110500                ld      de,5
+    49  0038  af                    xor     a
+    50                          @InitSprites:
+    51  0039  dd7700                ld      (ix+0),a
+    52  003c  dd7701                ld      (ix+1),a
+    53  003f  dd7702                ld      (ix+2),a
+    54  0042  dd7103                ld      (ix+3),c        ; %01000000 - enable byte 4
+    55  0045  dd7700                ld      (ix+0),a
+    56  0048  dd19                  add     ix,de
+    57  004a  10ed                  djnz    @InitSprites
+    58  004c  c9                    ret
+    59                          
+    60                          
+    61                          ; ******************************************************************************************************************************
+    62                          ;   Wait for a Vertical Blank (uses VBlank IRQ)
+    63                          ; ******************************************************************************************************************************
+    64                          _WaitVBlank:
+    65  004d  af                    xor a
+    66  004e  320000                ld  (_VBlank),a
+    67                          
+    68                          WaitForVBlank:
+    69  0051  3a0000                ld  a,(_VBlank)
+    70  0054  a7                    and a
+    71  0055  28fa                  jr  z,WaitForVBlank
+    72  0057  c9                    ret
+    73                          
+    74                          
+    75                          
+    76                          ; ************************************************************************
+    77                          ;   Enable the 256 colour Layer 2 bitmap
+    78                          ;
+    79                          ;   In:     L=0  off        (fastcall passes bool as a byte in L)
+    80                          ;           L!=0 on
+    81                          ; ************************************************************************
+    82                          _Layer2Enable:
+    83  0058  7d                    ld  a,l
+    84  0059  a7                    and a
+    85  005a  2802                  jr  z,@Layer2Off
+    86  005c  2e02                  ld  l,2
+    87                          
+    88                          @Layer2Off:
+    89  005e  3a0000                ld  a,(_Port123b)
+    90  0061  b5                    or  l
+    91  0062  320000                ld  (_Port123b),a
+    92  0065  013b12                ld  bc, $123b
+    93  0068  ed79                  out (c),a
+    94  006a  c9                    ret
+    95                          
+    96                          
+    97                          
+    98                          ; ************************************************************************
+    99                          ;
+   100                          ;   Function:   Clear the spectrum attribute screen
+   101                          ;   In:     L = attribute
+   102                          ;
+   103                          ;   Format: F_B_PPP_III
+   104                          ;
+   105                          ;           F = Flash
+   106                          ;           B = Bright
+   107                          ;           P = Paper
+   108                          ;           I = Ink
+   109                          ;
+   110                          ; ************************************************************************
+   111                          _ClsATTR:
+   112  006b  7d                    ld      a,l
+   113  006c  210058                ld      hl,AttrScreen
+   114  006f  77                    ld      (hl),a
+   115  0070  110158                ld      de,AttrScreen+1
+   116  0073  01e803                ld      bc,1000
+   117  0076  edb0                  ldir
+   118  0078  c9                    ret
+   119                          
+   120                          
+   121                          ; ************************************************************************
+   122                          ;
+   123                          ;   Function:   clear the normal spectrum screen
+   124                          ;
+   125                          ; ************************************************************************
+   126                          _ClsULA:
+   127  0079  af                    xor a
+   128  007a  210040                ld      hl,ULAScreen
+   129  007d  77                    ld      (hl),a
+   130  007e  110140                ld      de,ULAScreen+1
+   131  0081  01ff17                ld      bc,6143
+   132  0084  edb0                  ldir
+   133  0086  c9                    ret
+   134                          
+   135                          ; ******************************************************************************
+   136                          ; Function: DMACopy
+   137                          ; In:       hl = Src
+   138                          ;           de = Dest
+   139                          ;           bc = size
+   140                          ; ******************************************************************************
+   141                          _DMACopy:
+   142  0087  e1                    pop     hl          ; get return address
+   143  0088  c1                    pop     bc          ; get src
+   144  0089  ed435202              ld      (DMASrc),bc
+   145  008d  c1                    pop     bc          ; get dest
+   146  008e  ed435b02              ld      (DMADest),bc
+   147  0092  c1                    pop     bc          ; get size
+   148  0093  ed435402              ld      (DMALen),bc
+   149  0097  e5                    push    hl          ; push return address back
+   150                          
+   151                          DoDMACopy:
+   152  0098  214e02                ld  hl,DMACopyProg
+   153  009b  016b13                ld  bc,DMASIZE*256 + Z80DMAPORT
+   154  009e  edb3                  otir
+   155  00a0  c9                    ret
+   156                          
+   157                          
+   158                          ; ******************************************************************************
+   159                          ; Function: DMACopy
+   160                          ; In:       hl = Src
+   161                          ;           de = Dest
+   162                          ;           bc = size
+   163                          ; ******************************************************************************
+   164                          DMACopy:
+   165  00a1  225202                ld      (DMASrc),hl
+   166  00a4  ed535b02              ld      (DMADest),de
+   167  00a8  ed435402              ld      (DMALen),bc
+   168  00ac  c39800                jp      DoDMACopy
+   169                          
+   170                          
+   171                          ; ******************************************************************************
+   172                          ;
+   173                          ; Function: Upload a set of sprites
+   174                          ; In:   E = sprite shape to start at
+   175                          ;       D = number of sprites
+   176                          ;       HL = shape data
+   177                          ;
+   178                          ; ******************************************************************************
+   179                          _UploadSprites:
+   180  00af  c1                    pop     bc          ; pop return address
+   181  00b0  d1                    pop     de          ; get Start Shape
+   182  00b1  e1                    pop     hl          ; get number of shapes
+   183  00b2  55                    ld      d,l
+   184  00b3  e1                    pop     hl          ; get shape address
+   185  00b4  c5                    push    bc          ; restore reeturn address
+   186                          
+   187                              ; Upload sprite graphics
+   188  00b5  7b                    ld      a,e     ; get start shape
+   189  00b6  1e00                  ld      e,0     ; each pattern is 256 bytes
+   190                          
+   191                          @AllSprites:
+   192                              ; select pattern 2
+   193  00b8  013b30                ld      bc, $303B
+   194  00bb  ed79                  out     (c),a
+   195                          
+   196                              ; upload ALL sprite sprite image data
+   197  00bd  015b00                ld      bc, SpriteShapePort
+   198                          @UpLoadSprite:
+   199  00c0  eda3                  outi
+   200                          
+   201  00c2  1b                    dec     de
+   202  00c3  7a                    ld      a,d
+   203  00c4  b3                    or      e
+   204  00c5  20f9                  jr      nz, @UpLoadSprite
+   205  00c7  c9                    ret
+   206                          
+   207                          ; ******************************************************************************
+   208                          ;
+   209                          ;   Print HEX to the screen
+   210                          ;   L  = hex value tp print
+   211                          ;   DE= address to print to (normal specturm screen)
+   212                          ;
+   213                          ; ******************************************************************************
+   214                          _PrintHex:
+   215  00c8  e1                        pop     hl          ; get return address
+   216  00c9  3b                        dec     sp          ; realign AF - Thanks z88dk!
+   217  00ca  f1                        pop     af          ; get AF
+   218  00cb  d1                        pop     de          ; get dest address
+   219  00cc  e5                        push    hl          ; push return address back
+   220                          
+   221  00cd  f5                        push    af
+   222  00ce  ed23                      swapnib
+   223  00d0  cdd700                    call    DrawHexCharacter
+   224  00d3  1c                        inc     e           ; next character on screen
+   225                          
+   226  00d4  f1                        pop af
+   227  00d5  e60f                      and $0f
+   228                          
+   229                                  ; fall through (call)
+   230                          
+   231                          ;
+   232                          ; A = NIBBLE hex value to print (0 to 15 only)
+   233                          ; DE= address to print to (normal specturm screen)
+   234                          ; uses: a,hl,de
+   235                          ;
+   236                          DrawHexCharacter:
+   237  00d7  e60f                      and $0f
+   238  00d9  21ce01                    ld  hl,HexCharset
+   239  00dc  87                        add a,a
+   240  00dd  87                        add a,a             ; *8
+   241  00de  87                        add a,a
+   242  00df  ed31                      add hl,a
+   243                          
+   244                                  ; data is aligned to 256 bytes
+   245  00e1  eda5                      ldws
+   246  00e3  eda5                      ldws
+   247  00e5  eda5                      ldws
+   248  00e7  eda5                      ldws
+   249  00e9  eda5                      ldws
+   250  00eb  eda5                      ldws
+   251  00ed  eda5                      ldws
+   252  00ef  eda5                      ldws
+   253                          
+   254  00f1  7a                        ld  a,d
+   255  00f2  d608                      sub 8           ; move back to the top of the screen character
+   256  00f4  57                        ld  d,a
+   257  00f5  c9                        ret
+   258                          
+   259                          TextSample:
+   260  00f6  48656c6c6f20576f          db  "Hello World 12\nEat Pooh\nTesting\n",0
+              726c642031320a45  
+              617420506f6f680a  
+              54657374696e670a  
+              00                
+   261                          
+   262                          ; ******************************************************************************
+   263                          ;
+   264                          ;   Print(X,Y,"Text")
+   265                          ;
+   266                          ; ******************************************************************************
+   267                          _Print:
+   268  0117  c1                    pop     bc              ; return address
+   269  0118  d1                    pop     de              ; get YX (D=Y,E=X)
+   270  0119  ed94                  pixelad
+   271  011b  d1                    pop     de              ; get text
+   272  011c  c5                    push    bc
+   273                          
+   274                          @DrawAll:
+   275  011d  1a                    ld      a,(de)
+   276  011e  fe0a                  cp      10
+   277  0120  280a                  jr      z,@NewLine
+   278  0122  a7                    and     a
+   279  0123  c8                    ret     z               ; ,0 terminated
+   280                          
+   281  0124  d620                  sub     32
+   282  0126  a7                    and     a
+   283  0127  200d                  jr      nz,@Skip
+   284  0129  23                    inc     hl
+   285  012a  180d                  jr      @NextChar
+   286                          
+   287                          @NewLine:
+   288  012c  0608                  ld      b,8
+   289                          @down8:
+   290  012e  ed93                  pixeldn
+   291  0130  10fc                  djnz    @down8
+   292  0132  2e00                  ld      l,0
+   293  0134  1803                  jr      @NextChar
+   294                          
+   295                          @Skip:
+   296  0136  cd3d01                call    DrawCharacter
+   297                          
+   298                          @NextChar:
+   299  0139  13                    inc     de
+   300  013a  c31d01                jp      @DrawAll
+   301                          
+   302                          ;
+   303                          ; A = NIBBLE hex value to print (0 to 15 only)
+   304                          ; HL= address to print to (normal specturm screen)
+   305                          ; uses: a,hl,de
+   306                          ;
+   307                          DrawCharacter:
+   308  013d  d5                    push    de
+   309  013e  e5                    push    hl
+   310  013f  1600                  ld      d,0                 ; char * 8
+   311  0141  cb27                  sla     a
+   312  0143  cb12                  rl      d
+   313  0145  cb27                  sla     a
+   314  0147  cb12                  rl      d
+   315  0149  cb27                  sla     a
+   316  014b  cb12                  rl      d
+   317  014d  5f                    ld      e,a
+   318  014e  ed359102              add     de,_RomFont         ; add on base
+   319                          
+   320  0152  0608                  ld      b,8
+   321                          @WholeChar:
+   322  0154  1a                    ld      a,(de)
+   323  0155  77                    ld      (hl),a
+   324  0156  ed93                  pixeldn
+   325  0158  13                    inc     de
+   326  0159  10f9                  djnz    @WholeChar
+   327                          
+   328  015b  e1                    pop     hl
+   329  015c  d1                    pop     de
+   330  015d  23                    inc     hl
+   331  015e  c9                    ret
+   332                          
+   333                          
+   334                          ; ******************************************************************************
+   335                          ; Function: Scan the whole keyboard
+   336                          ; ******************************************************************************
+   337                          _ReadKeyboard:
+   338  015f  0627                      ld  b,39
+   339  0161  216102                    ld  hl,_Keys
+   340  0164  af                        xor a
+   341  0165  77                @lp1:   ld  (hl),a
+   342  0166  23                        inc hl
+   343  0167  10fc                      djnz    @lp1
+   344                          
+   345  0169  fd216102                  ld  iy,_Keys
+   346  016d  01fefe                    ld  bc,$fefe            ; Caps,Z,X,C,V
+   347  0170  218902                    ld  hl,_RawKeys
+   348                          @ReadAllKeys:
+   349  0173  ed78                      in  a,(c)
+   350  0175  77                        ld  (hl),a
+   351  0176  23                        inc hl
+   352                          
+   353  0177  1605                      ld  d,5
+   354  0179  1eff                      ld  e,$ff
+   355                          @DoAll:
+   356  017b  cb3f                      srl a
+   357  017d  3803                      jr  c,@notset
+   358  017f  fd7300                    ld  (iy+0),e
+   359                          @notset:
+   360  0182  fd23                      inc iy
+   361  0184  15                        dec d
+   362  0185  20f4                      jr  nz,@DoAll
+   363                          
+   364  0187  78                        ld  a,b
+   365  0188  cb27                      sla a
+   366  018a  3006                      jr  nc,ExitKeyRead
+   367  018c  f601                      or  1
+   368  018e  47                        ld  b,a
+   369  018f  c37301                    jp  @ReadAllKeys
+   370                          ExitKeyRead:
+   371  0192  c9                        ret
+   372                          
+   373                          ; ******************************************************************************
+   374                          ; Function: Copy sprite data (x,y etc) to BRAM (assumes extended data)
+   375                          ; In:   hl = Src
+   376                          ;       d = slot
+   377                          ;       a = count
+   378                          ;
+   379                          ;
+   380                          ;   |*|*||0011 0000 0011 1011| 0x303b  |Sprite slot, flags
+   381                          ;   | |*||XXXX XXXX 0101 0111| 0x57    |Sprite attributes
+   382                          ;   | |*||XXXX XXXX 0101 1011| 0x5b    |Sprite pattern
+   383                          
+   384                          ; ******************************************************************************
+   385                          _CopySpriteData:
+   386  0193  219108                    ld      hl,_SpriteData
+   387  0196  22bf01                    ld      (DMASpSrc),hl                       ; 16
+   388  0199  013b30                    ld      bc,$303b
+   389  019c  ed51                      out     (c),d
+   390  019e  218002                    ld      hl,640                              ; 128 * 5
+   391  01a1  22c101                    ld      (DMASpLen),hl                       ; store size
+   392  01a4  21bb01                    ld      hl,DMASpriteCopyProg                ; 10
+   393  01a7  016b13                    ld      bc,Z80DMAPORT+(DMASPCOPYSIZE*256)   ; 10
+   394  01aa  edb3                      otir                                        ; 21*20  + 240*4
+   395  01ac  c9                        ret
+   396                          
+   397                          ; ******************************************************************************
+   398                          ; Function: Read a next register
+   399                          ;           uint16 v = ReadNextReg(uint16 reg)
+   400                          ; ******************************************************************************
+   401                          _ReadNextReg:
+   402  01ad  d1                        pop     de          ; get return address
+   403  01ae  e1                        pop     hl
+   404                          
+   405                                  ; read MSB of raster first
+   406  01af  013b24                    ld      bc,$243b    ; select NEXT register
+   407  01b2  ed69                      out     (c),l
+   408  01b4  04                        inc     b           ; $253b to access (read or write) value
+   409  01b5  ed68                      in      l,(c)
+   410  01b7  2600                      ld      h,0
+   411  01b9  d5                        push    de          ; push return address back
+   412  01ba  c9                        ret                 ; return in HL
+   413                          
+   414                          
+   415                          ; ******************************************************************************************************************************
+   416                          ; ******************************************************************************************************************************
+   417                          ; ******************************************************************************************************************************
+   418                          ;       Kernel Data
+   419                          ; ******************************************************************************************************************************
+   420                          ; ******************************************************************************************************************************
+   421                          ; ******************************************************************************************************************************
+   422                          DMASpriteCopyProg:
+   423  01bb  c3                        db $C3          ; R6-RESET DMA
+   424  01bc  c7                        db $C7          ; R6-RESET PORT A Timing
+   425  01bd  cb                        db $CB          ; R6-SET PORT B Timing same as PORT A
+   426                          
+   427  01be  7d                        db $7D          ; R0-Transfer mode, A -> B
+   428                          DMASpSrc:
+   429  01bf  3412                      dw $1234        ; R0-Port A, Start address               (source address)
+   430                          DMASpLen:
+   431  01c1  f000                      dw 240          ; R0-Block length                        (length in bytes)
+   432                          
+   433  01c3  54                        db $54          ; R1-Port A address incrementing, variable timing
+   434  01c4  02                        db $02          ; R1-Cycle length port A
+   435                          
+   436  01c5  78                        db $78          ; R2-Port B address fixed, variable timing Write to a "PORT"
+   437  01c6  02                        db $02          ; R2-Cycle length (2) port B
+   438                          
+   439  01c7  ad                        db $AD          ; R4-Continuous mode  (use this for block tansfer)
+   440                          DMASpDest:
+   441  01c8  5700                      dw $0057        ; R4-Dest address (Sprite DATA)          (destination port)
+   442                          
+   443  01ca  82                        db $82          ; R5-Restart on end of block, RDY active LOW
+   444                          
+   445  01cb  cf                        db $CF          ; R6-Load
+   446  01cc  b3                        db $B3          ; R6-Force Ready
+   447  01cd  87                        db $87          ; R6-Enable DMA
+   448                          ENDSPDMA:
+   449                                  defc    DMASPCOPYSIZE   = ENDSPDMA-DMASpriteCopyProg
+   450                          
+   451                          
+   452                          
+   453                          
+   454                          
+   455                          HexCharset:
+   456  01ce  00                        db %00000000    ;char30  '0'
+   457  01cf  3c                        db %00111100
+   458  01d0  46                        db %01000110
+   459  01d1  4a                        db %01001010
+   460  01d2  52                        db %01010010
+   461  01d3  62                        db %01100010
+   462  01d4  3c                        db %00111100
+   463  01d5  00                        db %00000000
+   464  01d6  00                        db %00000000    ;char31 '1'
+   465  01d7  18                        db %00011000
+   466  01d8  28                        db %00101000
+   467  01d9  08                        db %00001000
+   468  01da  08                        db %00001000
+   469  01db  08                        db %00001000
+   470  01dc  3e                        db %00111110
+   471  01dd  00                        db %00000000
+   472  01de  00                        db %00000000    ;char32 '2'
+   473  01df  3c                        db %00111100
+   474  01e0  42                        db %01000010
+   475  01e1  02                        db %00000010
+   476  01e2  3c                        db %00111100
+   477  01e3  40                        db %01000000
+   478  01e4  7e                        db %01111110
+   479  01e5  00                        db %00000000
+   480  01e6  00                        db %00000000    ;char33 '3'
+   481  01e7  3c                        db %00111100
+   482  01e8  42                        db %01000010
+   483  01e9  0c                        db %00001100
+   484  01ea  02                        db %00000010
+   485  01eb  42                        db %01000010
+   486  01ec  3c                        db %00111100
+   487  01ed  00                        db %00000000
+   488  01ee  00                        db %00000000    ;char34 '4'
+   489  01ef  08                        db %00001000
+   490  01f0  18                        db %00011000
+   491  01f1  28                        db %00101000
+   492  01f2  48                        db %01001000
+   493  01f3  7e                        db %01111110
+   494  01f4  08                        db %00001000
+   495  01f5  00                        db %00000000
+   496  01f6  00                        db %00000000    ;char35 '5'
+   497  01f7  7e                        db %01111110
+   498  01f8  40                        db %01000000
+   499  01f9  7c                        db %01111100
+   500  01fa  02                        db %00000010
+   501  01fb  42                        db %01000010
+   502  01fc  3c                        db %00111100
+   503  01fd  00                        db %00000000
+   504  01fe  00                        db %00000000    ;char36 '6'
+   505  01ff  3c                        db %00111100
+   506  0200  40                        db %01000000
+   507  0201  7c                        db %01111100
+   508  0202  42                        db %01000010
+   509  0203  42                        db %01000010
+   510  0204  3c                        db %00111100
+   511  0205  00                        db %00000000
+   512  0206  00                        db %00000000    ;char37 '7'
+   513  0207  7e                        db %01111110
+   514  0208  02                        db %00000010
+   515  0209  04                        db %00000100
+   516  020a  08                        db %00001000
+   517  020b  10                        db %00010000
+   518  020c  10                        db %00010000
+   519  020d  00                        db %00000000
+   520  020e  00                        db %00000000    ;char38 '8'
+   521  020f  3c                        db %00111100
+   522  0210  42                        db %01000010
+   523  0211  3c                        db %00111100
+   524  0212  42                        db %01000010
+   525  0213  42                        db %01000010
+   526  0214  3c                        db %00111100
+   527  0215  00                        db %00000000
+   528  0216  00                        db %00000000    ;char39 '9'
+   529  0217  3c                        db %00111100
+   530  0218  42                        db %01000010
+   531  0219  42                        db %01000010
+   532  021a  3e                        db %00111110
+   533  021b  02                        db %00000010
+   534  021c  3c                        db %00111100
+   535  021d  00                        db %00000000
+   536  021e  00                        db %00000000    ;char41 'A'
+   537  021f  3c                        db %00111100
+   538  0220  42                        db %01000010
+   539  0221  42                        db %01000010
+   540  0222  7e                        db %01111110
+   541  0223  42                        db %01000010
+   542  0224  42                        db %01000010
+   543  0225  00                        db %00000000
+   544  0226  00                        db %00000000    ;char42 'B'
+   545  0227  7c                        db %01111100
+   546  0228  42                        db %01000010
+   547  0229  7c                        db %01111100
+   548  022a  42                        db %01000010
+   549  022b  42                        db %01000010
+   550  022c  7c                        db %01111100
+   551  022d  00                        db %00000000
+   552  022e  00                        db %00000000    ;char43 'C'
+   553  022f  3c                        db %00111100
+   554  0230  42                        db %01000010
+   555  0231  40                        db %01000000
+   556  0232  40                        db %01000000
+   557  0233  42                        db %01000010
+   558  0234  3c                        db %00111100
+   559  0235  00                        db %00000000
+   560  0236  00                        db %00000000    ;char44 'D'
+   561  0237  78                        db %01111000
+   562  0238  44                        db %01000100
+   563  0239  42                        db %01000010
+   564  023a  42                        db %01000010
+   565  023b  44                        db %01000100
+   566  023c  78                        db %01111000
+   567  023d  00                        db %00000000
+   568  023e  00                        db %00000000    ;char45 'E'
+   569  023f  7e                        db %01111110
+   570  0240  40                        db %01000000
+   571  0241  7c                        db %01111100
+   572  0242  40                        db %01000000
+   573  0243  40                        db %01000000
+   574  0244  7e                        db %01111110
+   575  0245  00                        db %00000000
+   576  0246  00                        db %00000000    ;char46 'F'
+   577  0247  7e                        db %01111110
+   578  0248  40                        db %01000000
+   579  0249  7c                        db %01111100
+   580  024a  40                        db %01000000
+   581  024b  40                        db %01000000
+   582  024c  40                        db %01000000
+   583  024d  00                        db %00000000
+   584                          
+   585                          
+   586                          ; ******************************************************************************
+   587                          ; Writable DMA Program
+   588                          ; ******************************************************************************
+   589                          DMACopyProg:
+   590  024e  c3                            db  $C3             ; R6-RESET DMA
+   591  024f  c7                            db  $C7             ; R6-RESET PORT A Timing
+   592  0250  cb                            db  $CB             ; R6-SET PORT B Timing same as PORT A
+   593                          
+   594  0251  7d                            db  $7D             ; R0-Transfer mode, A -> B
+   595  0252  0000              DMASrc:     dw  $0000           ; R0-Port A, Start address      (source address)
+   596  0254  001b              DMALen:     dw  6912            ; R0-Block length           (length in bytes)
+   597                          
+   598  0256  54                            db  $54             ; R1-Port A address incrementing, variable timing
+   599  0257  02                            db  $02             ; R1-Cycle length port A
+   600                          
+   601  0258  50                            db  $50             ; R2-Port B address fixed, variable timing
+   602  0259  02                            db  $02             ; R2-Cycle length port B
+   603                          
+   604  025a  ad                            db  $AD             ; R4-Continuous mode  (use this for block tansfer)
+   605  025b  0040              DMADest:    dw  $4000           ; R4-Dest address           (destination address)
+   606                          
+   607  025d  82                            db  $82             ; R5-Restart on end of block, RDY active LOW
+   608                          
+   609  025e  cf                            db  $CF             ; R6-Load
+   610  025f  b3                            db  $B3             ; R6-Force Ready
+   611  0260  87                            db  $87             ; R6-Enable DMA
+   612                          ENDDMA:
+   613                          
+   614                                      defc DMASIZE = ENDDMA-DMACopyProg
+   615                          
+   616  0261  0000000000000000  _Keys:      ds  40
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+   617  0289  0000000000000000  _RawKeys:   ds  8
+   618  0291  0000000000000000  _RomFont:   ds  0x300       ; copy of the ROM font
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+   619  0591  0000000000000000              incbin  "ROMFONT.FNT"
+              0010101010001000  
+              0024240000000000  
+              00247e24247e2400  
+              00083e283e0a3e08  
+              0062640810264600  
+              001028102a443a00  
+              0008100000000000  
+              0004080808080400  
+              0020101010102000  
+              000014083e081400  
+              000008083e080800  
+              0000000000080810  
+              000000003e000000  
+              0000000000181800  
+              0000020408102000  
+              003c464a52623c00  
+              0018280808083e00  
+              003c42023c407e00  
+              003c420c02423c00  
+              00081828487e0800  
+              007e407c02423c00  
+              003c407c42423c00  
+              007e020408101000  
+              003c423c42423c00  
+              003c42423e023c00  
+              0000001000001000  
+              0000100000101020  
+              0000040810080400  
+              0000003e003e0000  
+              0000100804081000  
+              003c420408000800  
+              003c4a565e403c00  
+              003c42427e424200  
+              007c427c42427c00  
+              003c424040423c00  
+              0078444242447800  
+              007e407c40407e00  
+              007e407c40404000  
+              003c42404e423c00  
+              0042427e42424200  
+              003e080808083e00  
+              0002020242423c00  
+              0044487048444200  
+              0040404040407e00  
+              0042665a42424200  
+              004262524a464200  
+              003c424242423c00  
+              007c42427c404000  
+              003c4242524a3c00  
+              007c42427c444200  
+              003c403c02423c00  
+              00fe101010101000  
+              0042424242423c00  
+              0042424242241800  
+              00424242425a2400  
+              0042241818244200  
+              0082442810101000  
+              007e040810207e00  
+              000e080808080e00  
+              0000402010080400  
+              0070101010107000  
+              0010385410101000  
+              00000000000000ff  
+              001c227820207e00  
+              000038043c443c00  
+              0020203c22223c00  
+              00001c2020201c00  
+              0004043c44443c00  
+              0000384478403c00  
+              000c101810101000  
+              00003c44443c0438  
+              0040407844444400  
+              0010003010103800  
+              0004000404042418  
+              0020283030282400  
+              0010101010100c00  
+              0000685454545400  
+              0000784444444400  
+              0000384444443800  
+              0000784444784040  
+              00003c44443c0406  
+              00001c2020202000  
+              0000384038047800  
+              0010381010100c00  
+              0000444444443800  
+              0000444428281000  
+              0000445454542800  
+              0000442810284400  
+              00004444443c0438  
+              00007c0810207c00  
+              000e083008080e00  
+              0008080808080800  
+              0070100c10107000  
+              0014280000000000  
+              3c4299a1a199423c  
+   620                          
+   621                                      ; xxxxxxxx
+   622                                      ; yyyyyyyy
+   623                                      ; PPPP_XM_YM_R_X8/PR
+   624                                      ; V_E_NNNNNN
+   625                                      ; H_N6_T_XX_YY_Y8
+   626                                      ; +- 0_1_N6_XX_YY_PO
+   627                                      ; +- 0_1_N6_0000_PO
+   628                          
+   629  0891  0000000000000000  _SpriteData: ds  128*5           ; raw sprite data
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+              0000000000000000  
+   630                          
+   631                          _SpriteShape:
+   632  0b11  e3e3e3e3e3ffffe3              db  $e3,$e3,$e3,$e3,$e3,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   633  0b21  e3e3ffffffffffe3              db  $e3,$e3,$ff,$ff,$ff,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   634  0b31  e3ffffffffffe3e3              db  $e3,$ff,$ff,$ff,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   635  0b41  e3e3ffffe3ffe3e3              db  $e3,$e3,$ff,$ff,$e3,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   636  0b51  e3e3ffffffffffe3              db  $e3,$e3,$ff,$ff,$ff,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   637  0b61  e3e3ffffffffe3e3              db  $e3,$e3,$ff,$ff,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   638  0b71  e3e3e3ffffe3e3e3              db  $e3,$e3,$e3,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   639  0b81  e3e3ffffffffe3e3              db  $e3,$e3,$ff,$ff,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   640  0b91  e3ffffffffffffe3              db  $e3,$ff,$ff,$ff,$ff,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   641  0ba1  e3ffffffffffffe3              db  $e3,$ff,$ff,$ff,$ff,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   642  0bb1  ffffffffe3ffffff              db  $ff,$ff,$ff,$ff,$e3,$ff,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   643  0bc1  ffffffffffe3ffff              db  $ff,$ff,$ff,$ff,$ff,$e3,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   644  0bd1  e3e3ffffffffe3e3              db  $e3,$e3,$ff,$ff,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   645  0be1  e3ffffffe3ffffe3              db  $e3,$ff,$ff,$ff,$e3,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   646  0bf1  e3ffffe3ffffe3e3              db  $e3,$ff,$ff,$e3,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   647  0c01  e3ffffffe3ffffff              db  $e3,$ff,$ff,$ff,$e3,$ff,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   648                          
+   649  0c11  ffffffffffffffff              db  $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff
+              ffffffffffffffff  
+   650  0c21  ffff000000000000              db  $ff,$ff,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$ff,$ff
+              000000000000ffff  
+   651  0c31  ff00ff0000000000              db  $ff,$00,$ff,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$ff,$00,$ff
+              0000000000ff00ff  
+   652  0c41  ff0000ff00000000              db  $ff,$00,$00,$ff,$00,$00,$00,$00,$00,$00,$00,$00,$ff,$00,$00,$ff
+              00000000ff0000ff  
+   653  0c51  ff000000ff000000              db  $ff,$00,$00,$00,$ff,$00,$00,$00,$00,$00,$00,$ff,$00,$00,$00,$ff
+              000000ff000000ff  
+   654  0c61  ff00000000ff0000              db  $ff,$00,$00,$00,$00,$ff,$00,$00,$00,$00,$ff,$00,$00,$00,$00,$ff
+              0000ff00000000ff  
+   655  0c71  ff0000000000ff00              db  $ff,$00,$00,$00,$00,$00,$ff,$00,$00,$ff,$00,$00,$00,$00,$00,$ff
+              00ff0000000000ff  
+   656  0c81  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$ff,$00,$00,$00,$00,$00,$00,$ff
+              ff000000000000ff  
+   657  0c91  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$ff,$00,$00,$00,$00,$00,$00,$ff
+              ff000000000000ff  
+   658  0ca1  ff0000000000ff00              db  $ff,$00,$00,$00,$00,$00,$ff,$00,$00,$ff,$00,$00,$00,$00,$00,$ff
+              00ff0000000000ff  
+   659  0cb1  ff00000000ff0000              db  $ff,$00,$00,$00,$00,$ff,$00,$00,$00,$00,$ff,$00,$00,$00,$00,$ff
+              0000ff00000000ff  
+   660  0cc1  ff000000ff000000              db  $ff,$00,$00,$00,$ff,$00,$00,$00,$00,$00,$00,$ff,$00,$00,$00,$ff
+              000000ff000000ff  
+   661  0cd1  ff0000ff00000000              db  $ff,$00,$00,$ff,$00,$00,$00,$00,$00,$00,$00,$00,$ff,$00,$00,$ff
+              00000000ff0000ff  
+   662  0ce1  ff00ff0000000000              db  $ff,$00,$ff,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$ff,$00,$ff
+              0000000000ff00ff  
+   663  0cf1  ffff000000000000              db  $ff,$ff,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$ff,$ff
+              000000000000ffff  
+   664  0d01  ffffffffffffffff              db  $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff
+              ffffffffffffffff  
+   665                          
+   666  0d11  ffffffffffffffff              db  $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   667  0d21  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   668  0d31  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   669  0d41  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   670  0d51  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   671  0d61  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   672  0d71  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   673  0d81  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   674  0d91  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   675  0da1  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   676  0db1  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   677  0dc1  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   678  0dd1  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   679  0de1  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   680  0df1  ff000000000000ff              db  $ff,$00,$00,$00,$00,$00,$00,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   681  0e01  ffffffffffffffff              db  $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$e3,$e3,$e3,$e3,$e3,$e3,$e3,$e3
+              e3e3e3e3e3e3e3e3  
+   682                          
+   683                          _EndKernel:
+   684                          
+   685                          
+   686                          
