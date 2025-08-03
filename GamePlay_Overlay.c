@@ -70,7 +70,8 @@ void GP_Render( void )
     // (Slot, x, y, pattern?, attributes, visible)
     set_sprite_attributes(0, 116, 100, 0, 0x00, true);
 
-    set_sprite_attributes(1, 100, 100, 0, 0x00, true);
+    //set_sprite_attributes(1, 100, 100, 0, 0x00, true);
+    //set_sprite_attributes(2, 130, 100, 0, 0x00, true);
 } 
 
 //  ***************************************************************************************
@@ -87,8 +88,11 @@ void GP_Quit( void )
 void LoadSprites()
 {
     extern const unsigned char sprites[];
+    extern const unsigned char pallette[];
 
-    int number_sprites = 8;
+    set_sprite_palette(pallette, 17, 0);
+
+    int number_sprites = 1;
 
     for(int i; i < number_sprites; i++)
     {

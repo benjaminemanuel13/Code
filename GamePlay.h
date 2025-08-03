@@ -11,6 +11,7 @@ extern void GP_Process( void );
 extern void GP_Render( void );
 extern void GP_Quit( void );
 
+void LoadSprites();
 
  #endif // __GAMEPLAY_H__
 

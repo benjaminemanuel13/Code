@@ -1,4 +1,4 @@
-C:/Users/benja/AppData/Local/Temp/zcc00000710A6D02.asm:
+C:/Users/benja/AppData/Local/Temp/zcc000052F86A882.asm:
      1                          MODULE GamePlay_Overlay_c
      2                          LINE 0, "GamePlay_Overlay.c"
 GamePlay_Overlay.c:
@@ -212,12 +212,12 @@ GamePlay_Overlay.c:
    207                          ;--------------------------------------------------------
    208                          ; Public variables in this module
    209                          ;--------------------------------------------------------
-   210                          	GLOBAL _LoadSprites
-   211                          	GLOBAL _counter
-   212                          	GLOBAL _GP_Init
-   213                          	GLOBAL _GP_Process
-   214                          	GLOBAL _GP_Render
-   215                          	GLOBAL _GP_Quit
+   210                          	GLOBAL _counter
+   211                          	GLOBAL _GP_Init
+   212                          	GLOBAL _GP_Process
+   213                          	GLOBAL _GP_Render
+   214                          	GLOBAL _GP_Quit
+   215                          	GLOBAL _LoadSprites
    216                          ;--------------------------------------------------------
    217                          ; Externals used
    218                          ;--------------------------------------------------------
@@ -1064,280 +1064,266 @@ GamePlay_Overlay.c:
   1059                          	GLOBAL _ZXN_WRITE_REG
   1060                          	GLOBAL _ZXN_READ_REG_fastcall
   1061                          	GLOBAL _ZXN_READ_REG
-  1062                          	GLOBAL _sprites
-  1063                          	GLOBAL _GameState
-  1064                          	GLOBAL _RawKeys
-  1065                          	GLOBAL _Keys
-  1066                          	GLOBAL _Port123b
-  1067                          	GLOBAL _VBlank
-  1068                          	GLOBAL _errno
-  1069                          	GLOBAL _stderr
-  1070                          	GLOBAL _stdout
-  1071                          	GLOBAL _stdin
-  1072                          	GLOBAL __MAX_FOPEN
-  1073                          	GLOBAL _GLOBAL_ZXN_PORT_DFFD
-  1074                          	GLOBAL _GLOBAL_ZXN_PORT_7FFD
-  1075                          	GLOBAL _GLOBAL_ZXN_PORT_1FFD
-  1076                          	GLOBAL _GLOBAL_ZXN_PORT_FE
-  1077                          	GLOBAL _GLOBAL_TS_PORT_FE
-  1078                          	GLOBAL _GLOBAL_ZX_PORT_7FFD
-  1079                          	GLOBAL _GLOBAL_ZX_PORT_1FFD
-  1080                          	GLOBAL _GLOBAL_ZX_PORT_FE
-  1081                          ;--------------------------------------------------------
-  1082                          ; special function registers
-  1083                          ;--------------------------------------------------------
-  1084                          defc _IO_FE	=	0x00fe
-  1085                          defc _IO_FF	=	0x00ff
-  1086                          defc _IO_TIMEX_VIDEO_MODE	=	0x00ff
-  1087                          defc _IO_1FFD	=	0x1ffd
-  1088                          defc _IO_7FFD	=	0x7ffd
-  1089                          defc _IO_DFFD	=	0xdffd
-  1090                          defc _IO_0F	=	0x000f
-  1091                          defc _IO_DAC_L0	=	0x000f
-  1092                          defc _IO_1F	=	0x001f
-  1093                          defc _IO_DAC_L1	=	0x001f
-  1094                          defc _IO_4F	=	0x004f
-  1095                          defc _IO_DAC_R0	=	0x004f
-  1096                          defc _IO_5F	=	0x005f
-  1097                          defc _IO_DAC_R1	=	0x005f
-  1098                          defc _IO_DF	=	0x00df
-  1099                          defc _IO_DAC_M0	=	0x00df
-  1100                          defc _IO_FFFD	=	0xfffd
-  1101                          defc _IO_TURBOSOUND	=	0xfffd
-  1102                          defc _IO_AY_REG	=	0xfffd
-  1103                          defc _IO_BFFD	=	0xbffd
-  1104                          defc _IO_AY_DAT	=	0xbffd
-  1105                          defc _IO_123B	=	0x123b
-  1106                          defc _IO_LAYER_2_CONFIG	=	0x123b
-  1107                          defc _IO_303B	=	0x303b
-  1108                          defc _IO_SPRITE_SLOT	=	0x303b
-  1109                          defc _IO_SPRITE_FLAGS	=	0x303b
-  1110                          defc _IO_57	=	0x0057
-  1111                          defc _IO_SPRITE_ATTRIBUTE	=	0x0057
-  1112                          defc _IO_5B	=	0x005b
-  1113                          defc _IO_SPRITE_PATTERN	=	0x005b
-  1114                          defc _IO_143B	=	0x143b
-  1115                          defc _IO_UART_RX	=	0x143b
-  1116                          defc _IO_UART_BAUD_RATE	=	0x143b
-  1117                          defc _IO_133B	=	0x133b
-  1118                          defc _IO_UART_TX	=	0x133b
-  1119                          defc _IO_UART_STATUS	=	0x133b
-  1120                          defc _IO_6B	=	0x006b
-  1121                          defc _IO_DMA	=	0x006b
-  1122                          defc _IO_E3	=	0x00e3
-  1123                          defc _IO_DIVIDE_CONTROL	=	0x00e3
-  1124                          defc _IO_E7	=	0x00e7
-  1125                          defc _IO_SPI_CONTROL	=	0x00e7
-  1126                          defc _IO_SPI_STATUS	=	0x00e7
-  1127                          defc _IO_EB	=	0x00eb
-  1128                          defc _IO_SPI_DATA	=	0x00eb
-  1129                          defc _IO_103B	=	0x103b
-  1130                          defc _IO_I2C_SCL	=	0x103b
-  1131                          defc _IO_113B	=	0x113b
-  1132                          defc _IO_I2C_SDA	=	0x113b
-  1133                          defc _IO_LED_L	=	0x103b
-  1134                          defc _IO_243B	=	0x243b
-  1135                          defc _IO_NEXTREG_REG	=	0x243b
-  1136                          defc _IO_253B	=	0x253b
-  1137                          defc _IO_NEXTREG_DAT	=	0x253b
-  1138                          ;--------------------------------------------------------
-  1139                          ; ram data
-  1140                          ;--------------------------------------------------------
-  1141                          	SECTION bss_compiler
-  1142                          _counter:
-  1143  0000  0000              	DEFS 2
-  1144                          ;--------------------------------------------------------
-  1145                          ; ram data
-  1146                          ;--------------------------------------------------------
-  1147                          
-  1148                          IF 0
-  1149                          
-  1150                          ; .area _INITIALIZED removed by z88dk
-  1151                          
+  1062                          	GLOBAL _pallette
+  1063                          	GLOBAL _sprites
+  1064                          	GLOBAL _GameState
+  1065                          	GLOBAL _RawKeys
+  1066                          	GLOBAL _Keys
+  1067                          	GLOBAL _Port123b
+  1068                          	GLOBAL _VBlank
+  1069                          	GLOBAL _errno
+  1070                          	GLOBAL _stderr
+  1071                          	GLOBAL _stdout
+  1072                          	GLOBAL _stdin
+  1073                          	GLOBAL __MAX_FOPEN
+  1074                          	GLOBAL _GLOBAL_ZXN_PORT_DFFD
+  1075                          	GLOBAL _GLOBAL_ZXN_PORT_7FFD
+  1076                          	GLOBAL _GLOBAL_ZXN_PORT_1FFD
+  1077                          	GLOBAL _GLOBAL_ZXN_PORT_FE
+  1078                          	GLOBAL _GLOBAL_TS_PORT_FE
+  1079                          	GLOBAL _GLOBAL_ZX_PORT_7FFD
+  1080                          	GLOBAL _GLOBAL_ZX_PORT_1FFD
+  1081                          	GLOBAL _GLOBAL_ZX_PORT_FE
+  1082                          ;--------------------------------------------------------
+  1083                          ; special function registers
+  1084                          ;--------------------------------------------------------
+  1085                          defc _IO_FE	=	0x00fe
+  1086                          defc _IO_FF	=	0x00ff
+  1087                          defc _IO_TIMEX_VIDEO_MODE	=	0x00ff
+  1088                          defc _IO_1FFD	=	0x1ffd
+  1089                          defc _IO_7FFD	=	0x7ffd
+  1090                          defc _IO_DFFD	=	0xdffd
+  1091                          defc _IO_0F	=	0x000f
+  1092                          defc _IO_DAC_L0	=	0x000f
+  1093                          defc _IO_1F	=	0x001f
+  1094                          defc _IO_DAC_L1	=	0x001f
+  1095                          defc _IO_4F	=	0x004f
+  1096                          defc _IO_DAC_R0	=	0x004f
+  1097                          defc _IO_5F	=	0x005f
+  1098                          defc _IO_DAC_R1	=	0x005f
+  1099                          defc _IO_DF	=	0x00df
+  1100                          defc _IO_DAC_M0	=	0x00df
+  1101                          defc _IO_FFFD	=	0xfffd
+  1102                          defc _IO_TURBOSOUND	=	0xfffd
+  1103                          defc _IO_AY_REG	=	0xfffd
+  1104                          defc _IO_BFFD	=	0xbffd
+  1105                          defc _IO_AY_DAT	=	0xbffd
+  1106                          defc _IO_123B	=	0x123b
+  1107                          defc _IO_LAYER_2_CONFIG	=	0x123b
+  1108                          defc _IO_303B	=	0x303b
+  1109                          defc _IO_SPRITE_SLOT	=	0x303b
+  1110                          defc _IO_SPRITE_FLAGS	=	0x303b
+  1111                          defc _IO_57	=	0x0057
+  1112                          defc _IO_SPRITE_ATTRIBUTE	=	0x0057
+  1113                          defc _IO_5B	=	0x005b
+  1114                          defc _IO_SPRITE_PATTERN	=	0x005b
+  1115                          defc _IO_143B	=	0x143b
+  1116                          defc _IO_UART_RX	=	0x143b
+  1117                          defc _IO_UART_BAUD_RATE	=	0x143b
+  1118                          defc _IO_133B	=	0x133b
+  1119                          defc _IO_UART_TX	=	0x133b
+  1120                          defc _IO_UART_STATUS	=	0x133b
+  1121                          defc _IO_6B	=	0x006b
+  1122                          defc _IO_DMA	=	0x006b
+  1123                          defc _IO_E3	=	0x00e3
+  1124                          defc _IO_DIVIDE_CONTROL	=	0x00e3
+  1125                          defc _IO_E7	=	0x00e7
+  1126                          defc _IO_SPI_CONTROL	=	0x00e7
+  1127                          defc _IO_SPI_STATUS	=	0x00e7
+  1128                          defc _IO_EB	=	0x00eb
+  1129                          defc _IO_SPI_DATA	=	0x00eb
+  1130                          defc _IO_103B	=	0x103b
+  1131                          defc _IO_I2C_SCL	=	0x103b
+  1132                          defc _IO_113B	=	0x113b
+  1133                          defc _IO_I2C_SDA	=	0x113b
+  1134                          defc _IO_LED_L	=	0x103b
+  1135                          defc _IO_243B	=	0x243b
+  1136                          defc _IO_NEXTREG_REG	=	0x243b
+  1137                          defc _IO_253B	=	0x253b
+  1138                          defc _IO_NEXTREG_DAT	=	0x253b
+  1139                          ;--------------------------------------------------------
+  1140                          ; ram data
+  1141                          ;--------------------------------------------------------
+  1142                          	SECTION bss_compiler
+  1143                          _counter:
+  1144  0000  0000              	DEFS 2
+  1145                          ;--------------------------------------------------------
+  1146                          ; ram data
+  1147                          ;--------------------------------------------------------
+  1148                          
+  1149                          IF 0
+  1150                          
+  1151                          ; .area _INITIALIZED removed by z88dk
   1152                          
-  1153                          ENDIF
-  1154                          
-  1155                          ;--------------------------------------------------------
-  1156                          ; absolute external ram data
-  1157                          ;--------------------------------------------------------
-  1158                          	SECTION IGNORE
-  1159                          ;--------------------------------------------------------
-  1160                          ; global & static initialisations
-  1161                          ;--------------------------------------------------------
-  1162                          	SECTION code_crt_init
-  1163                          ;--------------------------------------------------------
-  1164                          ; Home
-  1165                          ;--------------------------------------------------------
-  1166                          	SECTION code_home
-  1167                          ;--------------------------------------------------------
-  1168                          ; code
-  1169                          ;--------------------------------------------------------
-  1170                          	SECTION PAGE_06_GAMEPLAY_SEG
-  1171                          ;GamePlay_Overlay.c:35: void GP_Init( void )
-  1172                          ;	---------------------------------
-  1173                          ; Function GP_Init
-  1174                          ; ---------------------------------
-  1175                          _GP_Init:
-  1176                          ;GamePlay_Overlay.c:37: ClsATTR(8);
-  1177  0000  2e08              	ld	l,0x08
-  1178  0002  cd0000            	call	_ClsATTR
-  1179                          ;GamePlay_Overlay.c:38: ClsULA();
-  1180  0005  cd0000            	call	_ClsULA
-  1181                          ;GamePlay_Overlay.c:39: InitSpriteData();
-  1182  0008  cd0000            	call	_InitSpriteData
-  1183                          ;GamePlay_Overlay.c:41: LoadSprites();
-  1184  000b  cda600            	call	_LoadSprites
-  1185                          ;GamePlay_Overlay.c:44: SetState(State_Game);
-  1186  000e  210000            	ld	hl,_GameState
-  1187  0011  3605              	ld	(hl),0x05
-  1188                          ;GamePlay_Overlay.c:45: }
-  1189  0013  c9                	ret
-  1190                          ;GamePlay_Overlay.c:50: void GP_Process( void )
-  1191                          ;	---------------------------------
-  1192                          ; Function GP_Process
-  1193                          ; ---------------------------------
-  1194                          _GP_Process:
-  1195                          ;GamePlay_Overlay.c:52: if( Keys[VK_2]!=0)
-  1196  0014  011000            	ld	bc,_Keys+16
-  1197  0017  0a                	ld	a, (bc)
-  1198  0018  b7                	or	a, a
-  1199  0019  2807              	jr	Z,l_GP_Process_00102
-  1200                          ;GamePlay_Overlay.c:54: Keys[VK_2] = 0;
-  1201  001b  af                	xor	a, a
-  1202  001c  02                	ld	(bc), a
-  1203                          ;GamePlay_Overlay.c:55: SetState(State_QuitGame);
-  1204  001d  210000            	ld	hl,_GameState
-  1205  0020  3606              	ld	(hl),0x06
-  1206                          l_GP_Process_00102:
-  1207                          ;GamePlay_Overlay.c:58: counter++;
-  1208  0022  2a0000            	ld	hl, (_counter)
-  1209  0025  23                	inc	hl
-  1210  0026  220000            	ld	(_counter), hl
-  1211                          ;GamePlay_Overlay.c:59: }
-  1212  0029  c9                	ret
-  1213                          ;GamePlay_Overlay.c:64: void GP_Render( void )
-  1214                          ;	---------------------------------
-  1215                          ; Function GP_Render
-  1216                          ; ---------------------------------
-  1217                          _GP_Render:
-  1218                          ;GamePlay_Overlay.c:66: Print(0,48,"GP_Render - [2] to Quit\n");
-  1219  002a  217000            	ld	hl,___str_0
-  1220  002d  e5                	push	hl
-  1221  002e  3e30              	ld	a,0x30
-  1222  0030  f5                	push	af
-  1223  0031  33                	inc	sp
-  1224  0032  af                	xor	a, a
-  1225  0033  f5                	push	af
-  1226  0034  33                	inc	sp
-  1227  0035  cd0000            	call	_Print
-  1228                          ;GamePlay_Overlay.c:71: set_sprite_attributes(0, 116, 100, 0, 0x00, true);
-  1229  0038  3e01              	ld	a,0x01
-  1230  003a  f5                	push	af
-  1231  003b  33                	inc	sp
-  1232  003c  af                	xor	a, a
-  1233  003d  f5                	push	af
-  1234  003e  33                	inc	sp
-  1235  003f  af                	xor	a, a
-  1236  0040  57                	ld	d,a
-  1237  0041  1e64              	ld	e,0x64
-  1238  0043  d5                	push	de
-  1239  0044  217400            	ld	hl,0x0074
-  1240  0047  e5                	push	hl
-  1241  0048  af                	xor	a, a
-  1242  0049  f5                	push	af
-  1243  004a  33                	inc	sp
-  1244  004b  cd0000            	call	_set_sprite_attributes
-  1245  004e  210700            	ld	hl,7
-  1246  0051  39                	add	hl, sp
-  1247  0052  f9                	ld	sp, hl
-  1248                          ;GamePlay_Overlay.c:73: set_sprite_attributes(1, 100, 100, 0, 0x00, true);
-  1249  0053  3e01              	ld	a,0x01
-  1250  0055  f5                	push	af
-  1251  0056  33                	inc	sp
-  1252  0057  af                	xor	a, a
-  1253  0058  f5                	push	af
-  1254  0059  33                	inc	sp
-  1255  005a  af                	xor	a, a
-  1256  005b  57                	ld	d,a
-  1257  005c  1e64              	ld	e,0x64
-  1258  005e  d5                	push	de
-  1259  005f  216400            	ld	hl,0x0064
-  1260  0062  e5                	push	hl
-  1261  0063  3e01              	ld	a,0x01
-  1262  0065  f5                	push	af
-  1263  0066  33                	inc	sp
-  1264  0067  cd0000            	call	_set_sprite_attributes
-  1265  006a  210700            	ld	hl,7
-  1266  006d  39                	add	hl, sp
-  1267  006e  f9                	ld	sp, hl
-  1268                          ;GamePlay_Overlay.c:74: }
-  1269  006f  c9                	ret
-  1270                          	SECTION PAGE_06_GAMEPLAY_SEG
-  1271                          ___str_0:
-  1272  0070  47505f52656e6465  	DEFM "GP_Render - [2] to Quit"
+  1153                          
+  1154                          ENDIF
+  1155                          
+  1156                          ;--------------------------------------------------------
+  1157                          ; absolute external ram data
+  1158                          ;--------------------------------------------------------
+  1159                          	SECTION IGNORE
+  1160                          ;--------------------------------------------------------
+  1161                          ; global & static initialisations
+  1162                          ;--------------------------------------------------------
+  1163                          	SECTION code_crt_init
+  1164                          ;--------------------------------------------------------
+  1165                          ; Home
+  1166                          ;--------------------------------------------------------
+  1167                          	SECTION code_home
+  1168                          ;--------------------------------------------------------
+  1169                          ; code
+  1170                          ;--------------------------------------------------------
+  1171                          	SECTION PAGE_06_GAMEPLAY_SEG
+  1172                          ;GamePlay_Overlay.c:35: void GP_Init( void )
+  1173                          ;	---------------------------------
+  1174                          ; Function GP_Init
+  1175                          ; ---------------------------------
+  1176                          _GP_Init:
+  1177                          ;GamePlay_Overlay.c:37: ClsATTR(8);
+  1178  0000  2e08              	ld	l,0x08
+  1179  0002  cd0000            	call	_ClsATTR
+  1180                          ;GamePlay_Overlay.c:38: ClsULA();
+  1181  0005  cd0000            	call	_ClsULA
+  1182                          ;GamePlay_Overlay.c:39: InitSpriteData();
+  1183  0008  cd0000            	call	_InitSpriteData
+  1184                          ;GamePlay_Overlay.c:41: LoadSprites();
+  1185  000b  cd8a00            	call	_LoadSprites
+  1186                          ;GamePlay_Overlay.c:44: SetState(State_Game);
+  1187  000e  210000            	ld	hl,_GameState
+  1188  0011  3605              	ld	(hl),0x05
+  1189                          ;GamePlay_Overlay.c:45: }
+  1190  0013  c9                	ret
+  1191                          ;GamePlay_Overlay.c:50: void GP_Process( void )
+  1192                          ;	---------------------------------
+  1193                          ; Function GP_Process
+  1194                          ; ---------------------------------
+  1195                          _GP_Process:
+  1196                          ;GamePlay_Overlay.c:52: if( Keys[VK_2]!=0)
+  1197  0014  011000            	ld	bc,_Keys+16
+  1198  0017  0a                	ld	a, (bc)
+  1199  0018  b7                	or	a, a
+  1200  0019  2807              	jr	Z,l_GP_Process_00102
+  1201                          ;GamePlay_Overlay.c:54: Keys[VK_2] = 0;
+  1202  001b  af                	xor	a, a
+  1203  001c  02                	ld	(bc), a
+  1204                          ;GamePlay_Overlay.c:55: SetState(State_QuitGame);
+  1205  001d  210000            	ld	hl,_GameState
+  1206  0020  3606              	ld	(hl),0x06
+  1207                          l_GP_Process_00102:
+  1208                          ;GamePlay_Overlay.c:58: counter++;
+  1209  0022  2a0000            	ld	hl, (_counter)
+  1210  0025  23                	inc	hl
+  1211  0026  220000            	ld	(_counter), hl
+  1212                          ;GamePlay_Overlay.c:59: }
+  1213  0029  c9                	ret
+  1214                          ;GamePlay_Overlay.c:64: void GP_Render( void )
+  1215                          ;	---------------------------------
+  1216                          ; Function GP_Render
+  1217                          ; ---------------------------------
+  1218                          _GP_Render:
+  1219                          ;GamePlay_Overlay.c:66: Print(0,48,"GP_Render - [2] to Quit\n");
+  1220  002a  215400            	ld	hl,___str_0
+  1221  002d  e5                	push	hl
+  1222  002e  3e30              	ld	a,0x30
+  1223  0030  f5                	push	af
+  1224  0031  33                	inc	sp
+  1225  0032  af                	xor	a, a
+  1226  0033  f5                	push	af
+  1227  0034  33                	inc	sp
+  1228  0035  cd0000            	call	_Print
+  1229                          ;GamePlay_Overlay.c:71: set_sprite_attributes(0, 116, 100, 0, 0x00, true);
+  1230  0038  3e01              	ld	a,0x01
+  1231  003a  f5                	push	af
+  1232  003b  33                	inc	sp
+  1233  003c  af                	xor	a, a
+  1234  003d  f5                	push	af
+  1235  003e  33                	inc	sp
+  1236  003f  af                	xor	a, a
+  1237  0040  57                	ld	d,a
+  1238  0041  1e64              	ld	e,0x64
+  1239  0043  d5                	push	de
+  1240  0044  217400            	ld	hl,0x0074
+  1241  0047  e5                	push	hl
+  1242  0048  af                	xor	a, a
+  1243  0049  f5                	push	af
+  1244  004a  33                	inc	sp
+  1245  004b  cd0000            	call	_set_sprite_attributes
+  1246  004e  210700            	ld	hl,7
+  1247  0051  39                	add	hl, sp
+  1248  0052  f9                	ld	sp, hl
+  1249                          ;GamePlay_Overlay.c:75: }
+  1250  0053  c9                	ret
+  1251                          	SECTION PAGE_06_GAMEPLAY_SEG
+  1252                          ___str_0:
+  1253  0054  47505f52656e6465  	DEFM "GP_Render - [2] to Quit"
               72202d205b325d20  
               746f2051756974    
-  1273  0087  0a                	DEFB 0x0a
-  1274  0088  00                	DEFB 0x00
-  1275                          	SECTION PAGE_06_GAMEPLAY_SEG
-  1276                          ;GamePlay_Overlay.c:79: void GP_Quit( void )
-  1277                          ;	---------------------------------
-  1278                          ; Function GP_Quit
-  1279                          ; ---------------------------------
-  1280                          _GP_Quit:
-  1281                          ;GamePlay_Overlay.c:81: Print(0,58,"GP_Quit\n");
-  1282  0089  219d00            	ld	hl,___str_1
-  1283  008c  e5                	push	hl
-  1284  008d  3e3a              	ld	a,0x3a
-  1285  008f  f5                	push	af
-  1286  0090  33                	inc	sp
-  1287  0091  af                	xor	a, a
-  1288  0092  f5                	push	af
-  1289  0093  33                	inc	sp
-  1290  0094  cd0000            	call	_Print
-  1291                          ;GamePlay_Overlay.c:84: SetState(State_InitFrontEnd);
-  1292  0097  210000            	ld	hl,_GameState
-  1293  009a  3601              	ld	(hl),0x01
-  1294                          ;GamePlay_Overlay.c:85: }
-  1295  009c  c9                	ret
-  1296                          	SECTION PAGE_06_GAMEPLAY_SEG
-  1297                          ___str_1:
-  1298  009d  47505f51756974    	DEFM "GP_Quit"
-  1299  00a4  0a                	DEFB 0x0a
-  1300  00a5  00                	DEFB 0x00
-  1301                          	SECTION PAGE_06_GAMEPLAY_SEG
-  1302                          ;GamePlay_Overlay.c:87: void LoadSprites()
-  1303                          ;	---------------------------------
-  1304                          ; Function LoadSprites
-  1305                          ; ---------------------------------
-  1306                          _LoadSprites:
-  1307                          ;GamePlay_Overlay.c:91: int number_sprites = 8;
-  1308  00a6  010000            	ld	bc,0x0000
-  1309                          l_LoadSprites_00103:
-  1310                          ;GamePlay_Overlay.c:93: for(int i; i < number_sprites; i++)
-  1311                          ;GamePlay_Overlay.c:95: set_sprite_slot(i);
-  1312  00a9  79                	ld	a,c
-  1313  00aa  fe08              	cp	a,0x08
-  1314  00ac  d0                	ret	NC
-  1315  00ad  c5                	push	bc
-  1316  00ae  f5                	push	af
-  1317  00af  33                	inc	sp
-  1318  00b0  cd0000            	call	_set_sprite_slot
-  1319  00b3  33                	inc	sp
-  1320  00b4  c1                	pop	bc
-  1321                          ;GamePlay_Overlay.c:96: set_sprite_pattern(sprites + (i * 256));
-  1322  00b5  51                	ld	d, c
-  1323  00b6  1e00              	ld	e,0x00
-  1324  00b8  210000            	ld	hl,_sprites
-  1325  00bb  19                	add	hl, de
-  1326  00bc  c5                	push	bc
-  1327  00bd  e5                	push	hl
-  1328  00be  cd0000            	call	_set_sprite_pattern
-  1329  00c1  f1                	pop	af
-  1330  00c2  c1                	pop	bc
-  1331                          ;GamePlay_Overlay.c:93: for(int i; i < number_sprites; i++)
-  1332  00c3  03                	inc	bc
-  1333                          ;GamePlay_Overlay.c:98: }
-  1334  00c4  18e3              	jr	l_LoadSprites_00103
-  1335                          	SECTION IGNORE
-  1336                          
+  1254  006b  0a                	DEFB 0x0a
+  1255  006c  00                	DEFB 0x00
+  1256                          	SECTION PAGE_06_GAMEPLAY_SEG
+  1257                          ;GamePlay_Overlay.c:80: void GP_Quit( void )
+  1258                          ;	---------------------------------
+  1259                          ; Function GP_Quit
+  1260                          ; ---------------------------------
+  1261                          _GP_Quit:
+  1262                          ;GamePlay_Overlay.c:82: Print(0,58,"GP_Quit\n");
+  1263  006d  218100            	ld	hl,___str_1
+  1264  0070  e5                	push	hl
+  1265  0071  3e3a              	ld	a,0x3a
+  1266  0073  f5                	push	af
+  1267  0074  33                	inc	sp
+  1268  0075  af                	xor	a, a
+  1269  0076  f5                	push	af
+  1270  0077  33                	inc	sp
+  1271  0078  cd0000            	call	_Print
+  1272                          ;GamePlay_Overlay.c:85: SetState(State_InitFrontEnd);
+  1273  007b  210000            	ld	hl,_GameState
+  1274  007e  3601              	ld	(hl),0x01
+  1275                          ;GamePlay_Overlay.c:86: }
+  1276  0080  c9                	ret
+  1277                          	SECTION PAGE_06_GAMEPLAY_SEG
+  1278                          ___str_1:
+  1279  0081  47505f51756974    	DEFM "GP_Quit"
+  1280  0088  0a                	DEFB 0x0a
+  1281  0089  00                	DEFB 0x00
+  1282                          	SECTION PAGE_06_GAMEPLAY_SEG
+  1283                          ;GamePlay_Overlay.c:88: void LoadSprites()
+  1284                          ;	---------------------------------
+  1285                          ; Function LoadSprites
+  1286                          ; ---------------------------------
+  1287                          _LoadSprites:
+  1288                          ;GamePlay_Overlay.c:93: set_sprite_palette(pallette, 17, 0);
+  1289  008a  af                	xor	a, a
+  1290  008b  f5                	push	af
+  1291  008c  33                	inc	sp
+  1292  008d  211100            	ld	hl,0x0011
+  1293  0090  e5                	push	hl
+  1294  0091  210000            	ld	hl,_pallette
+  1295  0094  e5                	push	hl
+  1296  0095  cd0000            	call	_set_sprite_palette
+  1297  0098  f1                	pop	af
+  1298  0099  f1                	pop	af
+  1299  009a  33                	inc	sp
+  1300                          ;GamePlay_Overlay.c:95: int number_sprites = 1;
+  1301  009b  af                	xor	a, a
+  1302                          l_LoadSprites_00103:
+  1303                          ;GamePlay_Overlay.c:97: for(int i; i < number_sprites; i++)
+  1304  009c  d601              	sub	a,0x01
+  1305  009e  d0                	ret	NC
+  1306                          ;GamePlay_Overlay.c:99: set_sprite_slot(i);
+  1307  009f  af                	xor	a, a
+  1308  00a0  f5                	push	af
+  1309  00a1  33                	inc	sp
+  1310  00a2  cd0000            	call	_set_sprite_slot
+  1311  00a5  33                	inc	sp
+  1312                          ;GamePlay_Overlay.c:100: set_sprite_pattern(sprites + (i * 256));
+  1313  00a6  210000            	ld	hl,_sprites
+  1314  00a9  e5                	push	hl
+  1315  00aa  cd0000            	call	_set_sprite_pattern
+  1316  00ad  f1                	pop	af
+  1317                          ;GamePlay_Overlay.c:97: for(int i; i < number_sprites; i++)
+  1318  00ae  3e01              	ld	a,0x01
+  1319                          ;GamePlay_Overlay.c:102: }
+  1320  00b0  18ea              	jr	l_LoadSprites_00103
+  1321                          	SECTION IGNORE
+  1322                          
