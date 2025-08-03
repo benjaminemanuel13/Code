@@ -88,7 +88,7 @@ void LoadSprites()
 {
     extern const unsigned char sprites[];
 
-    int number_sprites = 2;
+    int number_sprites = 8;
 
     for(int i; i < number_sprites; i++)
     {

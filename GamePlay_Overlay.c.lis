@@ -1,4 +1,4 @@
-C:/Users/benja/AppData/Local/Temp/zcc000037387B4D2.asm:
+C:/Users/benja/AppData/Local/Temp/zcc00000710A6D02.asm:
      1                          MODULE GamePlay_Overlay_c
      2                          LINE 0, "GamePlay_Overlay.c"
 GamePlay_Overlay.c:
@@ -1311,13 +1311,13 @@ GamePlay_Overlay.c:
   1304                          ; Function LoadSprites
   1305                          ; ---------------------------------
   1306                          _LoadSprites:
-  1307                          ;GamePlay_Overlay.c:91: int number_sprites = 2;
+  1307                          ;GamePlay_Overlay.c:91: int number_sprites = 8;
   1308  00a6  010000            	ld	bc,0x0000
   1309                          l_LoadSprites_00103:
   1310                          ;GamePlay_Overlay.c:93: for(int i; i < number_sprites; i++)
   1311                          ;GamePlay_Overlay.c:95: set_sprite_slot(i);
   1312  00a9  79                	ld	a,c
-  1313  00aa  fe02              	cp	a,0x02
+  1313  00aa  fe08              	cp	a,0x08
   1314  00ac  d0                	ret	NC
   1315  00ad  c5                	push	bc
   1316  00ae  f5                	push	af
