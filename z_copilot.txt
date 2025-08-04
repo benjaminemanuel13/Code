@@ -1,0 +1,45 @@
+void Send()
+{
+
+UART_TX_PORT  EQU 4923
+UART_RX_PORT  EQU 5179
+
+SendATCommand:
+    LD HL, Command
+.loop:
+    LD A, (HL)
+    CP 0
+    RET Z
+    OUT (UART_TX_PORT), A
+    INC HL
+    JP .loop
+
+WaitResponse:
+    IN A, (UART_TX_PORT)
+    BIT 0, A
+    JP Z, WaitResponse
+    IN A, (UART_RX_PORT)
+    ; You can store or print A here
+    RET
+}
+
+Command:
+    DB "AT+CIPSTART=\"TCP\",\"yourdomain.com\",80",13,0
+---------------------------------------------------------
+
+Connect To Wifi:
+
+DB "AT+CWJAP=\"SSID\",\"PASSWORD\"",13,0
+---------------------------------------------------------
+
+Start TCP Connection:
+
+DB "AT+CIPSTART=\"TCP\",\"yourdomain.com\",80",13,0
+---------------------------------------------------------
+
+HTTP GET (first is number bytes of GET)
+
+DB "AT+CIPSEND=44",13,0
+
+DB "GET /writefile.php?data=HelloWorld HTTP/1.1",13
+DB "Host: yourdomain.com",13,13,0

@@ -9,7 +9,7 @@ LIBS=-lm
 
 
 
-OBJS = Obj\main.o Obj\Kernel.o Obj\IRQs.o Obj\data.o Obj\FrontEnd_Overlay.o Obj\FrontEnd_Asm.o Obj\GamePlay_Overlay.o Obj\GamePlay_Asm.o
+OBJS = Obj\main.o Obj\Kernel.o Obj\uart.o Obj\IRQs.o Obj\data.o Obj\FrontEnd_Overlay.o Obj\FrontEnd_Asm.o Obj\GamePlay_Overlay.o Obj\GamePlay_Asm.o
 
 
 hello_world.nex: $(OBJS) 
@@ -29,6 +29,9 @@ Obj\Kernel.o: Kernel.asm includes.inc
 Obj\IRQs.o: IRQs.asm includes.inc
 	$(CC) $(CFLAGS) --codesegPAGE_02_KERNEL_IRQ --constsegPAGE_02_KERNEL_IRQ -o Obj\IRQs.o IRQs.asm
 
+# UART section
+Obj\Uart.o: uart.asm
+	$(CC) $(CFLAGS) --codesegPAGE_02_UART_CODE --constsegPAGE_02_UART_CODE -o Obj\uart.o uart.asm
 
 # Front End overlay
 Obj\FrontEnd_Overlay.o: FrontEnd_Overlay.c FrontEnd.h FrameWork.h Kernel.h

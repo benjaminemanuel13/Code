@@ -1,4 +1,4 @@
-C:/Users/benja/AppData/Local/Temp/zcc0000580C6B1F2.asm:
+C:/Users/benja/AppData/Local/Temp/zcc0000313491D72.asm:
      1                          MODULE GamePlay_Asm_asm
      2                          LINE 0, "GamePlay_Asm.asm"
 GamePlay_Asm.asm:
@@ -97,50 +97,51 @@ GamePlay_Asm.asm:
     18  000a  48656c6c6f            db "Hello"
     19                          
     20                          _sprites:
-    21  000f  e3e3e3e3e3e3e3e3  	db  $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3;
+    21                          ;Boy Facing Us
+    22  000f  e3e3e3e3e3e3e3e3  	db  $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3;
               e3e3e3e3e3e3e3e3  
-    22  001f  e3e3e3e3e3e3e3e3  	db  $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3;
+    23  001f  e3e3e3e3e3e3e3e3  	db  $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3;
               e3e3e3e3e3e3e3e3  
-    23  002f  e3e3e3e3e3e3e3e3  	db  $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3;
+    24  002f  e3e3e3e3e3e3e3e3  	db  $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3;
               e3e3e3e3e3e3e3e3  
-    24  003f  e3e3e3e3e3e3e3e3  	db  $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3;
+    25  003f  e3e3e3e3e3e3e3e3  	db  $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3, $E3;
               e3e3e3e3e3e3e3e3  
-    25  004f  e3e3e3e301010101  	db  $E3, $E3, $E3, $E3, $01, $01, $01, $01, $01, $01, $01, $E3, $E3, $E3, $E3, $E3;
+    26  004f  e3e3e3e301010101  	db  $E3, $E3, $E3, $E3, $01, $01, $01, $01, $01, $01, $01, $E3, $E3, $E3, $E3, $E3;
               010101e3e3e3e3e3  
-    26  005f  e3e3e301d1d1d1d5  	db  $E3, $E3, $E3, $01, $D1, $D1, $D1, $D5, $D1, $D1, $D1, $01, $E3, $E3, $E3, $E3;
+    27  005f  e3e3e301d1d1d1d5  	db  $E3, $E3, $E3, $01, $D1, $D1, $D1, $D5, $D1, $D1, $D1, $01, $E3, $E3, $E3, $E3;
               d1d1d101e3e3e3e3  
-    27  006f  e3e3e301d1d1d1d1  	db  $E3, $E3, $E3, $01, $D1, $D1, $D1, $D1, $D1, $D1, $D1, $01, $E3, $E3, $E3, $E3;
+    28  006f  e3e3e301d1d1d1d1  	db  $E3, $E3, $E3, $01, $D1, $D1, $D1, $D1, $D1, $D1, $D1, $01, $E3, $E3, $E3, $E3;
               d1d1d101e3e3e3e3  
-    28  007f  e3e301d1d6ffd6d1  	db  $E3, $E3, $01, $D1, $D6, $FF, $D6, $D1, $D6, $FF, $D6, $D1, $01, $E3, $E3, $E3;
+    29  007f  e3e301d1d6ffd6d1  	db  $E3, $E3, $01, $D1, $D6, $FF, $D6, $D1, $D6, $FF, $D6, $D1, $01, $E3, $E3, $E3;
               d6ffd6d101e3e3e3  
-    29  008f  e3e301ffff01ffff  	db  $E3, $E3, $01, $FF, $FF, $01, $FF, $FF, $FF, $01, $FF, $FF, $01, $E3, $E3, $E3;
+    30  008f  e3e301ffff01ffff  	db  $E3, $E3, $01, $FF, $FF, $01, $FF, $FF, $FF, $01, $FF, $FF, $01, $E3, $E3, $E3;
               ff01ffff01e3e3e3  
-    30  009f  e3e3e301ffffffff  	db  $E3, $E3, $E3, $01, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $01, $E3, $E3, $E3, $E3;
+    31  009f  e3e3e301ffffffff  	db  $E3, $E3, $E3, $01, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $01, $E3, $E3, $E3, $E3;
               ffffff01e3e3e3e3  
-    31  00af  e3e3e3e30101ffff  	db  $E3, $E3, $E3, $E3, $01, $01, $FF, $FF, $FF, $01, $01, $E3, $E3, $E3, $E3, $E3;
+    32  00af  e3e3e3e30101ffff  	db  $E3, $E3, $E3, $E3, $01, $01, $FF, $FF, $FF, $01, $01, $E3, $E3, $E3, $E3, $E3;
               ff0101e3e3e3e3e3  
-    32  00bf  e3e3e30101510101  	db  $E3, $E3, $E3, $01, $01, $51, $01, $01, $01, $51, $01, $01, $E3, $E3, $E3, $E3;
+    33  00bf  e3e3e30101510101  	db  $E3, $E3, $E3, $01, $01, $51, $01, $01, $01, $51, $01, $01, $E3, $E3, $E3, $E3;
               01510101e3e3e3e3  
-    33  00cf  e3e301d656565656  	db  $E3, $E3, $01, $D6, $56, $56, $56, $56, $56, $56, $56, $D6, $01, $E3, $E3, $E3;
+    34  00cf  e3e301d656565656  	db  $E3, $E3, $01, $D6, $56, $56, $56, $56, $56, $56, $56, $D6, $01, $E3, $E3, $E3;
               565656d601e3e3e3  
-    34  00df  e3e3e301018d8d92  	db  $E3, $E3, $E3, $01, $01, $8D, $8D, $92, $8D, $8D, $01, $01, $E3, $E3, $E3, $E3;
+    35  00df  e3e3e301018d8d92  	db  $E3, $E3, $E3, $01, $01, $8D, $8D, $92, $8D, $8D, $01, $01, $E3, $E3, $E3, $E3;
               8d8d0101e3e3e3e3  
-    35  00ef  e3e3e3e301515151  	db  $E3, $E3, $E3, $E3, $01, $51, $51, $51, $51, $51, $01, $E3, $E3, $E3, $E3, $E3;
+    36  00ef  e3e3e3e301515151  	db  $E3, $E3, $E3, $E3, $01, $51, $51, $51, $51, $51, $01, $E3, $E3, $E3, $E3, $E3;
               515101e3e3e3e3e3  
-    36  00ff  e3e3e3e301adad01  	db  $E3, $E3, $E3, $E3, $01, $AD, $AD, $01, $AD, $AD, $01, $E3, $E3, $E3, $E3, $E3;
+    37  00ff  e3e3e3e301adad01  	db  $E3, $E3, $E3, $E3, $01, $AD, $AD, $01, $AD, $AD, $01, $E3, $E3, $E3, $E3, $E3;
               adad01e3e3e3e3e3  
-    37                          
     38                          
-    39                          _pallette:
-    40  010f  ff                	db $FF
-    41  0110  25                	db $25
-    42  0111  72                	db $72
-    43  0112  bb                	db $BB
-    44  0113  294e              	db $29, $4E
-    45  0115  00                	db $00
-    46  0116  7380              	db $73, $80
-    47  0118  974569            	db $97, $45, $69
-    48  011b  8d                	db $8D
-    49  011c  65                	db $65
-    50  011d  b2db6d            	db $B2, $DB, $6D
-    51                          
+    39                          
+    40                          _pallette:
+    41  010f  ff                	db $FF
+    42  0110  25                	db $25
+    43  0111  72                	db $72
+    44  0112  bb                	db $BB
+    45  0113  294e              	db $29, $4E
+    46  0115  00                	db $00
+    47  0116  7380              	db $73, $80
+    48  0118  974569            	db $97, $45, $69
+    49  011b  8d                	db $8D
+    50  011c  65                	db $65
+    51  011d  b2db6d            	db $B2, $DB, $6D
+    52                          
